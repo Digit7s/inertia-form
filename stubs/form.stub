@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+use Digit7s\InertiaForm\AbstractForm;
+use Digit7s\InertiaForm\Fields\TextInput;
+use Digit7s\InertiaForm\Fields\Select;
+
+class {{ class }} extends AbstractForm
+{
+    /**
+     * Define the form fields and layout.
+     */
+    public function schema(): array
+    {
+        return [
+            TextInput::make('name')
+                ->label('Full Name')
+                ->required(),
+
+            TextInput::make('email')
+                ->label('Email Address')
+                ->required(),
+
+            Select::make('role')
+                ->options([
+                    'admin' => 'Admin User',
+                    'user' => 'Ordinary User',
+                ]),
+        ];
+    }
+}

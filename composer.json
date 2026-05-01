@@ -1,0 +1,24 @@
+{
+    "name": "digit7s/inertia-form",
+    "description": "A backend-driven form builder for Inertia.js and Vue 3.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Digit7s\\InertiaForm\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Digit7s\\InertiaForm\\InertiaFormServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/console": "^11.0|^12.0",
+        "illuminate/database": "^11.0|^12.0"
+    }
+}
