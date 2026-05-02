@@ -2,11 +2,11 @@
 
 namespace {{ namespace }};
 
-use Digit7s\InertiaForm\AbstractForm;
+use Digit7s\InertiaForm\InertiaForm;
 use Digit7s\InertiaForm\Fields\TextInput;
 use Digit7s\InertiaForm\Fields\Select;
 
-class {{ class }} extends AbstractForm
+class {{ class }} extends InertiaForm
 {
     /**
      * Define the form fields and layout.

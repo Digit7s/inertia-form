@@ -2,10 +2,30 @@
     "name": "digit7s/inertia-form",
     "description": "A backend-driven form builder for Inertia.js and Vue 3.",
     "type": "library",
+    "keywords": [
+        "laravel",
+        "inertiajs",
+        "vuejs",
+        "form-builder",
+        "dynamic-forms"
+    ],
     "license": "MIT",
+    "homepage": "https://github.com/Digit7s/inertia-form",
+    "authors": [
+        {
+            "name": "Myo Min Oo",
+            "email": "myomin.oo@digit7s.com",
+            "role": "Developer"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Digit7s\\InertiaForm\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Digit7s\\InertiaForm\\Tests\\": "tests/"
         }
     },
     "extra": {
@@ -20,5 +40,15 @@
         "illuminate/support": "^11.0|^12.0",
         "illuminate/console": "^11.0|^12.0",
         "illuminate/database": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.6",
+        "orchestra/testbench": "^10.11",
+        "laravel/pint": "^1.29"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

@@ -55,7 +55,7 @@ Select::make('user_id')
     ->relationship('users', 'name') // relationName, titleColumn
     ->searchable();
 ```
-> **Backend Note:** When using `relationship()`, the `AbstractForm` uses Eloquent's `pluck()` to fetch the ID and the specified title column to populate the options array automatically.
+> **Backend Note:** When using `relationship()`, the `InertiaForm` uses Eloquent's `pluck()` to fetch the ID and the specified title column to populate the options array automatically.
 
 ## States
 ```php

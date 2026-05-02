@@ -39,7 +39,7 @@ class Select extends Field
 
     /**
      * Populate options from an Eloquent relationship.
-     * This will be resolved automatically in the toArray() method of the AbstractForm.
+     * This will be resolved automatically in the toArray() method of the InertiaForm.
      */
     public function relationship(string $relationName, string $titleColumn): static
     {

@@ -1,32 +1,32 @@
 <?php
- 
+
 namespace Digit7s\InertiaForm\Layouts;
- 
+
 class Grid
 {
     protected int $columns = 2;
- 
+
     protected array $schema = [];
 
     protected int|string $columnSpan = 'full';
- 
+
     public function __construct(int $columns = 2)
     {
         $this->columns = $columns;
     }
- 
+
     public static function make(int $columns = 2): static
     {
         return new static($columns);
     }
- 
+
     public function schema(array $schema): static
     {
         $this->schema = $schema;
- 
+
         return $this;
     }
- 
+
     public function getSchema(): array
     {
         return $this->schema;
@@ -43,7 +43,7 @@ class Grid
     {
         return $this->columns;
     }
- 
+
     public function toArray(): array
     {
         return [
