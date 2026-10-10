@@ -103,4 +103,4 @@ If your application remains on Laravel 11, stay on the v1 package line while pla
 - `Grid` and built-in fields gain nested schema serialization and native Vue implementations. Rebuild after republishing them.
 - Select options preserve explicit labels, but relationship loading is bounded and no longer ignores relationship constraints.
 - The package does not perform server-side validation, authorization, rich-text sanitization, or database persistence. Those remain application code.
-- Laravel 13 support was added after v1.0.0. The v1.0.0 Packagist release only declares Laravel 11 and 12; the Phase 5 Laravel 12/13 CI matrix must pass before a v2 release claims those combinations.
+- Laravel 13 support was added after v1.0.0. The v1.0.0 Packagist release only declares Laravel 11 and 12. The v2 Laravel 12/13 matrix has passed on PHP 8.2, 8.3, and 8.5 as listed in the README.

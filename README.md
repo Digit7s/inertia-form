@@ -9,13 +9,13 @@ A fluent, backend-driven form builder for Laravel and Inertia.js (Vue 3). Define
 ## Requirements and Compatibility
 
 - **PHP**: `^8.2` in the package Composer constraints. Use the PHP version required by your chosen Laravel release (Laravel 13 requires PHP 8.3+).
-- **Laravel**: The v2 Composer constraints declare Laravel 12 and 13 through Illuminate components. Laravel 11 support is dropped for v2 because its security-fix window ended March 12, 2026. Phase 4's clean-host integration verified Laravel `13.35.0` on PHP `8.5.5`; the Phase 5 CI matrix is configured for PHP `8.2` with Laravel 12 and PHP `8.3` with Laravel 13. Those remote rows remain unverified until GitHub Actions runs.
+- **Laravel**: The v2 Composer constraints declare Laravel 12 and 13 through Illuminate components. Laravel 11 support is dropped for v2 because its security-fix window ended March 12, 2026. GitHub Actions verified PHP `8.2.34` with Laravel `12.69.3`, PHP `8.3.35` with Laravel `13.35.0`, and PHP `8.5.11` with Laravel `13.35.0`. The clean Laravel 13 consumer also passed on PHP `8.3.35`.
 - **PHP lifecycle**: PHP 8.2 remains supported through Laravel 12. Its upstream security-support period ends December 31, 2026, so the PHP minimum should be reviewed after that date.
 - **Inertia**: The consuming application must install and configure `inertiajs/inertia-laravel` and `@inertiajs/vue3`. Inertia 3 was verified with `inertiajs/inertia-laravel 3.5.1` and `@inertiajs/vue3 3.9.1`. Inertia 2 has not been verified and is outside the currently documented support contract.
 - **Frontend**: Vue `3.5.43`, Vite `7.3.7`, `@vitejs/plugin-vue 6.0.9`, and Node `22.23.2` were used for the clean-host build. Vite 7 requires Node `20.19+` or `22.12+`; install `vue`, `@inertiajs/vue3`, and the Vue Vite plugin if your app does not already provide them.
 - **Styling**: Components use native HTML controls plus Tailwind utility class names. Tailwind is not required to build or submit forms, but include the published component tree in the host Tailwind source/content scan to receive the documented spacing and control styling. There are no shadcn-vue, app-local UI component, icon-library, or global stylesheet imports.
 
-The version numbers above record tested versions. The GitHub Actions matrix must pass before a release claims the unverified PHP/Laravel rows.
+The version numbers above record tested versions. The Laravel/PHP combinations listed here have passed the GitHub Actions compatibility matrix; Inertia 3 has passed the clean-consumer integration, while Inertia 2 remains outside the documented support contract.
 
 Phase 4 is unreleased. Packagist `v1.0.0` predates these portability changes and does not contain all fields or behavior described for the current source tree. This work did not publish a new package version; use the local path instructions when you need to test the unreleased source.
 
