@@ -2,9 +2,16 @@
 
 namespace Digit7s\InertiaForm\Fields;
 
+use Closure;
+use InvalidArgumentException;
+
 class Select extends Field
 {
     protected string $type = 'select';
+
+    protected ?Closure $relationshipOptionsResolver = null;
+
+    protected int $relationshipOptionsLimit = 100;
 
     /**
      * Set the options for the select field.
@@ -49,6 +56,42 @@ class Select extends Field
         ];
 
         return $this;
+    }
+
+    /**
+     * Set an explicit constrained query for relationship options.
+     *
+     * The callback receives the Eloquent builder from the configured relation,
+     * including its relation constraints and model scopes. Return that builder
+     * (or another Eloquent builder) after applying the host application's
+     * tenant and authorization filters. Return the same builder instance so
+     * the configured relation constraints cannot be replaced accidentally.
+     */
+    public function relationshipOptions(Closure $constrain, int $limit = 100): static
+    {
+        if ($limit < 1 || $limit > 500) {
+            throw new InvalidArgumentException('Relationship option limits must be between 1 and 500.');
+        }
+
+        $this->relationshipOptionsResolver = $constrain;
+        $this->relationshipOptionsLimit = $limit;
+
+        return $this;
+    }
+
+    public function hasRelationshipOptionsResolver(): bool
+    {
+        return $this->relationshipOptionsResolver !== null;
+    }
+
+    public function getRelationshipOptionsResolver(): ?Closure
+    {
+        return $this->relationshipOptionsResolver;
+    }
+
+    public function getRelationshipOptionsLimit(): int
+    {
+        return $this->relationshipOptionsLimit;
     }
 
     /**

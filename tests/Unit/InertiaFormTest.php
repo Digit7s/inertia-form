@@ -48,6 +48,7 @@ it('serializes to array with correct structure', function () {
 it('detects method from model existence', function () {
     $model = Mockery::mock(Model::class);
     $model->shouldReceive('getAttribute')->andReturn(null);
+    $model->shouldReceive('hasAttribute')->andReturn(false);
 
     // New model -> post
     $model->exists = false;
