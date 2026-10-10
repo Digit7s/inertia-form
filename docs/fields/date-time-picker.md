@@ -1,6 +1,6 @@
 # Date/Time Picker
 
-The `DateTimePicker` field allows users to select a date and/or time. It supports both native browser pickers and a powerful custom Vue-based picker.
+Date and time fields render native browser controls. They serialize date values as `YYYY-MM-DD`, time values as `HH:mm` (or seconds when enabled), and datetime values in the browser's `datetime-local` format.
 
 ## Basic Usage
 
@@ -54,11 +54,11 @@ DatePicker::make('birthday')
 
 ## Native vs. Custom Pickers
 
-By default, the field uses native browser pickers (`<input type="date">`, etc.). You can switch to a custom Vue-based picker for a more consistent cross-browser experience:
+The current renderer always uses native browser pickers (`<input type="date">`, etc.). The `native(false)`, custom display/server formats, timezone conversion, disabled-date lists, and first-day-of-week metadata are preserved in the PHP schema but are not implemented by the native renderer yet:
 
 ```php
 DateTimePicker::make('event_at')
-    ->native(false)
+    ->native(true)
 ```
 
 ## Disabling Specific Dates
