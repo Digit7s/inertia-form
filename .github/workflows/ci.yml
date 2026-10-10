@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '12'
+            framework: '^12.55.0'
+            testbench: '^10.12'
+            pest: '^3.8.7'
+          - php: '8.3'
+            laravel: '13'
+            framework: '^13.32.0'
+            testbench: '^11.3'
+            pest: '^4.6'
+          - php: '8.5'
+            laravel: '13'
+            framework: '^13.32.0'
+            testbench: '^11.3'
+            pest: '^4.6'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-${{ matrix.php }}-
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-lock
+      - name: Resolve compatible test dependencies
+        run: >-
+          composer update --no-interaction --prefer-dist --with-all-dependencies
+          --with="laravel/framework:${{ matrix.framework }}"
+          --with="orchestra/testbench:${{ matrix.testbench }}"
+          --with="pestphp/pest:${{ matrix.pest }}"
+      - name: Check PHP syntax
+        run: find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Run Pest
+        run: composer test
+      - name: Check Pint formatting
+        run: composer lint
+
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+
+  clean-consumer:
+    name: Clean Laravel 13 consumer
+    runs-on: ubuntu-latest
+    needs: [php, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12'
+          cache: npm
+      - name: Install package into a fresh Laravel app, publish components, and build
+        run: bash scripts/ci/clean-consumer-smoke.sh
+        env:
+          RUN_BROWSER_TESTS: '1'

@@ -23,6 +23,9 @@ abstract class Field
 
     protected int|string|null $columnSpan = null;
 
+    /** Whether a sensitive resource value may be sent to the browser as a default. */
+    protected bool $hydrateSensitiveDefault = false;
+
     public function __construct(protected string $name)
     {
         $this->label = Str::headline($name);
@@ -54,6 +57,33 @@ abstract class Field
         $this->default = $value;
 
         return $this;
+    }
+
+    /**
+     * Explicitly allow automatic resource hydration for a sensitive field.
+     *
+     * This value is intentionally not serialized. Opting in sends the resolved
+     * resource value to the browser and must only be used for values the user
+     * is authorized to receive.
+     */
+    public function hydrateSensitiveDefault(bool $allow = true): static
+    {
+        $this->hydrateSensitiveDefault = $allow;
+
+        return $this;
+    }
+
+    /** Mark a field as sensitive so its resource value is not hydrated by default. */
+    public function sensitive(bool $sensitive = true): static
+    {
+        $this->meta['sensitive'] = $sensitive;
+
+        return $this;
+    }
+
+    public function allowsSensitiveDefaultHydration(): bool
+    {
+        return $this->hydrateSensitiveDefault;
     }
 
     /**

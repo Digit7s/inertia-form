@@ -3,9 +3,14 @@
 namespace Digit7s\InertiaForm;
 
 use Digit7s\InertiaForm\Fields\Field;
+use Digit7s\InertiaForm\Fields\Select;
 use Digit7s\InertiaForm\Layouts\Grid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use LogicException;
+use RuntimeException;
+use Throwable;
 
 abstract class InertiaForm
 {
@@ -120,7 +125,7 @@ abstract class InertiaForm
     /**
      * Define the form schema.
      *
-     * @return array<int, Field>
+     * @return array<int, Field|Grid>
      */
     abstract public function schema(): array;
 
@@ -129,8 +134,9 @@ abstract class InertiaForm
      */
     public function toArray(): array
     {
-        $schema = $this->resolveSchema($this->schema());
-        $defaults = $this->resolveDefaults($this->schema());
+        $fields = $this->schema();
+        $schema = $this->resolveSchema($fields);
+        $defaults = $this->resolveDefaults($fields);
 
         // Auto-detect method if not explicitly set.
         $method = $this->method;
@@ -162,23 +168,48 @@ abstract class InertiaForm
             if ($item instanceof Field) {
                 $data = $item->toArray();
 
-                // Resolve relationships automatically for Select fields.
-                if (isset($data['meta']['relationship'])) {
-                    $relationData = $data['meta']['relationship'];
+                // Explicit options take precedence, including an intentionally empty list.
+                if ($item instanceof Select && isset($data['meta']['relationship']) && ! array_key_exists('options', $data['meta'])) {
+                    $relationship = $data['meta']['relationship'];
+                    $fieldName = $data['name'];
+
+                    if (! $item->hasRelationshipOptionsResolver()) {
+                        throw new LogicException("Select field '{$fieldName}' uses relationship '{$relationship['name']}' without an explicit constrained relationshipOptions() query.");
+                    }
+
+                    if (! $this->resource instanceof Model) {
+                        throw new LogicException("Select field '{$fieldName}' requires an Eloquent model resource to resolve relationship options.");
+                    }
 
                     try {
-                        if ($this->resource instanceof Model) {
-                            $relation = $this->resource->{$relationData['name']}();
-                            $relatedModel = $relation->getRelated();
-                            $keyName = $relatedModel->getKeyName();
-
-                            $data['meta']['options'] = $relatedModel::query()
-                                ->pluck($relationData['title'], $keyName)
-                                ->toArray();
+                        $relation = $this->resource->{$relationship['name']}();
+                        if (! $relation instanceof Relation) {
+                            throw new LogicException('Configured method is not an Eloquent relationship.');
                         }
-                    } catch (\Throwable $e) {
-                        // Fail silently
+
+                        $relatedModel = $relation->getRelated();
+                        $resolver = $item->getRelationshipOptionsResolver();
+                        $query = $relation->getQuery();
+                        $constrainedQuery = $resolver($query);
+
+                        if ($constrainedQuery !== $query) {
+                            throw new LogicException('Relationship option callbacks must constrain and return the supplied query builder.');
+                        }
+
+                        $maximumRows = $item->getRelationshipOptionsLimit() + 1;
+                        $existingLimit = $query->getQuery()->limit;
+                        $query->limit($existingLimit === null ? $maximumRows : min($existingLimit, $maximumRows));
+                        $options = $query->pluck($relationship['title'], $relatedModel->qualifyColumn($relatedModel->getKeyName()));
+                    } catch (Throwable $exception) {
+                        // Keep database details and bindings out of user-facing exceptions.
+                        throw new RuntimeException("Unable to resolve options for select field '{$fieldName}' from relationship '{$relationship['name']}'. Check the relationship name, query constraints, and title column.");
                     }
+
+                    if ($options->count() > $item->getRelationshipOptionsLimit()) {
+                        throw new LogicException("Select field '{$fieldName}' relationship options exceed the configured limit of {$item->getRelationshipOptionsLimit()}. Add more restrictive query constraints or raise the limit up to 500.");
+                    }
+
+                    $data['meta']['options'] = $options->all();
                 }
 
                 return $data;
@@ -203,16 +234,30 @@ abstract class InertiaForm
                 $data = $item->toArray();
                 $value = $data['default'];
 
-                // Attempt to resolve the value from the resource if available.
-                if ($this->resource && $data['name'] !== 'password') {
-                    try {
-                        $resolvedValue = $this->resource->{$data['name']};
+                if ($this->resource !== null && (! $this->isSensitiveField($data) || $item->allowsSensitiveDefaultHydration())) {
+                    $resolved = $this->resourceValue($item, $data);
+                    if ($resolved['found']) {
+                        $resolvedValue = $resolved['value'];
 
                         if ($resolvedValue instanceof Collection) {
                             if ($data['name'] === 'roles') {
-                                $value = $resolvedValue->pluck('name')->toArray();
+                                $value = $resolvedValue->pluck('name')->all();
                             } else {
-                                $value = $resolvedValue->modelKeys();
+                                $value = $resolvedValue->map(function ($related) use ($data) {
+                                    if ($related instanceof Model) {
+                                        return $related->getKey();
+                                    }
+
+                                    if ($related instanceof \BackedEnum) {
+                                        return $related->value;
+                                    }
+
+                                    if (is_scalar($related) || $related === null) {
+                                        return $related;
+                                    }
+
+                                    throw new RuntimeException("Collection default for field '{$data['name']}' contains an unsupported value.");
+                                })->all();
                             }
                         } elseif ($resolvedValue instanceof \DateTimeInterface) {
                             if ($data['type'] === 'time') {
@@ -222,11 +267,15 @@ abstract class InertiaForm
                             } else {
                                 $value = $resolvedValue->format('Y-m-d H:i:s');
                             }
-                        } elseif ($resolvedValue !== null) {
+                        } elseif ($resolvedValue instanceof \BackedEnum) {
+                            $value = $resolvedValue->value;
+                        } elseif ($resolvedValue instanceof \Stringable) {
+                            $value = (string) $resolvedValue;
+                        } elseif (is_scalar($resolvedValue) || is_array($resolvedValue) || $resolvedValue === null) {
                             $value = $resolvedValue;
+                        } else {
+                            throw new RuntimeException("Default for field '{$data['name']}' has an unsupported value type.");
                         }
-                    } catch (\Throwable $e) {
-                        // Ignore
                     }
                 }
 
@@ -235,5 +284,88 @@ abstract class InertiaForm
         }
 
         return $defaults;
+    }
+
+    /** @return array{found: bool, value: mixed} */
+    protected function resourceValue(Field $field, array $data): array
+    {
+        $name = $data['name'];
+
+        try {
+            if ($this->resource instanceof Model) {
+                // Only resolve declared model attributes/accessors, or an explicitly
+                // configured relationship. Never probe arbitrary model properties.
+                if ($this->resource->hasAttribute($name)) {
+                    return ['found' => true, 'value' => $this->resource->getAttribute($name)];
+                }
+
+                $relationshipName = $data['meta']['relationship']['name'] ?? null;
+                if ($field instanceof Select && $field->hasRelationshipOptionsResolver() && $relationshipName === $name && method_exists($this->resource, $relationshipName)) {
+                    $relationship = $this->resource->{$relationshipName}();
+                    if ($relationship instanceof Relation) {
+                        $relatedModel = $relationship->getRelated();
+                        $key = $relatedModel->qualifyColumn($relatedModel->getKeyName());
+                        $query = $relationship->getQuery();
+                        $constrainedQuery = ($field->getRelationshipOptionsResolver())($query);
+
+                        if ($constrainedQuery !== $query) {
+                            throw new RuntimeException("Relationship default query for field '{$name}' must return its supplied builder.");
+                        }
+
+                        $maximumRows = $field->getRelationshipOptionsLimit() + 1;
+                        $existingLimit = $query->getQuery()->limit;
+                        $query->limit($existingLimit === null ? $maximumRows : min($existingLimit, $maximumRows));
+                        $values = $query->pluck($key);
+
+                        if ($values->count() > $field->getRelationshipOptionsLimit()) {
+                            throw new RuntimeException("Relationship defaults for field '{$name}' exceed the configured option limit.");
+                        }
+
+                        return ['found' => true, 'value' => $values];
+                    }
+                }
+
+                return ['found' => false, 'value' => null];
+            }
+
+            if (is_array($this->resource)) {
+                return array_key_exists($name, $this->resource)
+                    ? ['found' => true, 'value' => $this->resource[$name]]
+                    : ['found' => false, 'value' => null];
+            }
+
+            if (is_object($this->resource) && property_exists($this->resource, $name)) {
+                return ['found' => true, 'value' => $this->resource->{$name}];
+            }
+        } catch (Throwable) {
+            // Expose field-level context while keeping accessor and database details private.
+            throw new RuntimeException("Unable to resolve the default for field '{$name}'. Check the configured resource attribute or accessor.");
+        }
+
+        return ['found' => false, 'value' => null];
+    }
+
+    protected function isSensitiveField(array $data): bool
+    {
+        $name = strtolower((string) $data['name']);
+        $normalizedName = preg_replace('/[^a-z0-9]/', '', $name) ?? $name;
+        $inputType = strtolower((string) ($data['meta']['input_type'] ?? ''));
+
+        if ($inputType === 'password') {
+            return true;
+        }
+
+        foreach ([
+            'password', 'passwordconfirmation', 'currentpassword', 'newpassword',
+            'token', 'apitoken', 'accesstoken', 'refreshtoken', 'remembertoken',
+            'secret', 'clientsecret', 'apikey', 'appkey', 'encryptionkey', 'privatekey', 'signingkey',
+            'authorization', 'credentials', 'sessionid', 'twofactorsecret', 'recoverycodes',
+        ] as $sensitiveName) {
+            if ($normalizedName === $sensitiveName || str_contains($normalizedName, $sensitiveName)) {
+                return true;
+            }
+        }
+
+        return (bool) ($data['meta']['sensitive'] ?? false);
     }
 }

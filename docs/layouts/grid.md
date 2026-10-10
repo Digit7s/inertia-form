@@ -1,6 +1,8 @@
 # Grid Layout
  
 The `Grid` component allows you to arrange form fields into multiple columns. This is useful for grouping related fields side-by-side.
+
+Grids are presentational: field names and submitted keys remain the field names configured in PHP, including fields nested inside nested grids. Validation errors use those same names.
  
 ## Basic Usage
  
