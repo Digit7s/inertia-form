@@ -17,7 +17,7 @@ A fluent, backend-driven form builder for Laravel and Inertia.js (Vue 3). Define
 
 The version numbers above record tested versions. The Laravel/PHP combinations listed here have passed the GitHub Actions compatibility matrix; Inertia 3 has passed the clean-consumer integration, while Inertia 2 remains outside the documented support contract.
 
-Phase 4 is unreleased. Packagist `v1.0.0` predates these portability changes and does not contain all fields or behavior described for the current source tree. This work did not publish a new package version; use the local path instructions when you need to test the unreleased source.
+The v2.0.0 changes on this branch have not been published. Packagist `v1.0.0` predates these portability changes and does not contain all fields or behavior described for the current source tree. Use the local path instructions when you need to test this unreleased source.
 
 ## Installation
 
