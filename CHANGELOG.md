@@ -1,8 +1,8 @@
 # Changelog
 
-Notable changes are documented here. Dates use ISO 8601. The v2.0.0 entry describes the current release candidate and is not a published release.
+Notable changes are documented here. Dates use ISO 8601. A release date is added when it is known.
 
-## Unreleased — planned v2.0.0
+## v2.0.0
 
 ### Breaking changes
 
@@ -21,6 +21,12 @@ Notable changes are documented here. Dates use ISO 8601. The v2.0.0 entry descri
 - Laravel 13 is included in the package's declared Illuminate constraints and verified alongside Laravel 12 in the release compatibility matrix.
 - Form lifecycle props and exposed reset/submit controls, field error focus, upload progress, nested fields, and native component implementations.
 - Reproducible PHP, Vue, clean-consumer, and browser smoke quality gates are included in GitHub Actions.
+
+### Security improvements
+
+- Relationship option resolution retains Eloquent relationship constraints and applies a maximum option count; applications must still authorize submitted identifiers.
+- Sensitive model values are excluded from automatic defaults unless explicitly opted in.
+- Rich-text fallback values are rendered as plain text; the host application remains responsible for sanitizing content before storage and rendering.
 
 ### Fixed
 
