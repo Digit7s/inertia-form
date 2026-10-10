@@ -90,7 +90,7 @@ The built-in rich-text field was added after the v1.0.0 tag; its fallback is a n
 
 ## 9. Republish the new Vue component set
 
-v2 publishes source files from `resources/js/components` into `resources/js/InertiaForm/components`. Existing customized copies are consumer-owned and publishing can overwrite files at matching paths. Before updating, back up or commit those files, publish to a disposable checkout or inspect a diff, then merge package changes into customizations manually. See [installation and updates](docs/installation.md#component-updates).
+v2 publishes source files from `resources/js/components` into `resources/js/InertiaForm/components`. Composer updates the PHP package but do not update these copied Vue files. The normal `vendor:publish` command skips files that already exist and copies newly added files; `--force` overwrites matching consumer files. Compare package sources with your published copies, preserve or commit your customizations, and merge changes to customized files deliberately. See [installation and updates](docs/installation.md#component-updates).
 
 ## 10. Laravel 11 support has ended
 
