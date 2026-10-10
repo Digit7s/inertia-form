@@ -9,7 +9,7 @@ A fluent, backend-driven form builder for Laravel and Inertia.js (Vue 3). Define
 ## Requirements and Compatibility
 
 - **PHP**: `^8.2` in the package Composer constraints. Use the PHP version required by your chosen Laravel release (Laravel 13 requires PHP 8.3+).
-- **Laravel**: The v2 Composer constraints declare Laravel 12 and 13 through Illuminate components. Laravel 11 support is dropped for v2 because its security-fix window ended March 12, 2026. GitHub Actions verified PHP `8.2.34` with Laravel `12.69.3`, PHP `8.3.35` with Laravel `13.35.0`, and PHP `8.5.11` with Laravel `13.35.0`. The clean Laravel 13 consumer also passed on PHP `8.3.35`.
+- **Laravel**: The package Composer constraints support Laravel 12 and 13 through Illuminate components. Laravel 11 is not supported. GitHub Actions verified PHP `8.2.34` with Laravel `12.69.3`, PHP `8.3.35` with Laravel `13.35.0`, and PHP `8.5.11` with Laravel `13.35.0`. The clean Laravel 13 consumer also passed on PHP `8.3.35`.
 - **PHP lifecycle**: PHP 8.2 remains supported through Laravel 12. Its upstream security-support period ends December 31, 2026, so the PHP minimum should be reviewed after that date.
 - **Inertia**: The consuming application must install and configure `inertiajs/inertia-laravel` and `@inertiajs/vue3`. Inertia 3 was verified with `inertiajs/inertia-laravel 3.5.1` and `@inertiajs/vue3 3.9.1`. Inertia 2 has not been verified and is outside the currently documented support contract.
 - **Frontend**: Vue `3.5.43`, Vite `7.3.7`, `@vitejs/plugin-vue 6.0.9`, and Node `22.23.2` were used for the clean-host build. Vite 7 requires Node `20.19+` or `22.12+`; install `vue`, `@inertiajs/vue3`, and the Vue Vite plugin if your app does not already provide them.
@@ -17,7 +17,7 @@ A fluent, backend-driven form builder for Laravel and Inertia.js (Vue 3). Define
 
 The version numbers above record tested versions. The Laravel/PHP combinations listed here have passed the GitHub Actions compatibility matrix; Inertia 3 has passed the clean-consumer integration, while Inertia 2 remains outside the documented support contract.
 
-The v2.0.0 changes on this branch have not been published. Packagist `v1.0.0` predates these portability changes and does not contain all fields or behavior described for the current source tree. Use the local path instructions when you need to test this unreleased source.
+For package development, use the local path instructions in the installation guide. Normal application installation uses Packagist.
 
 ## Installation
 
@@ -151,7 +151,7 @@ defineProps({
 - `DatePicker` / `TimePicker` / `DateTimePicker` (native browser controls)
 - `File` (single file upload through Inertia)
 - `Grid` (including nested layouts)
-- `Radio`, `RichTextEditor`, and `MarkdownEditor` (available in the current working tree; these are not included in the v1.0.0 tag)
+- `Radio`, `RichTextEditor`, and `MarkdownEditor`
 
 `required()` and HTML constraints are browser hints. Define authorization, file rules, and server-side validation in Laravel; Inertia returns validation errors to the form helper.
 

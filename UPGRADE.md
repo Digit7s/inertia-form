@@ -1,6 +1,6 @@
 # Upgrading from v1.0.0 to v2.0.0
 
-The current development branch contains deliberate changes to published PHP and Vue behavior. It is prepared as **v2.0.0** because several of those changes require consumer code or published components to change. This guide describes the release candidate behavior; v2.0.0 has not been published.
+This guide describes the consumer changes required when upgrading from v1.0.0 to v2.0.0. Review the sections that apply to your application before updating the package and its published Vue components.
 
 ## 1. Relationship select options must be explicit and bounded
 
@@ -86,7 +86,7 @@ When submitted data contains a file and the requested verb is PUT, PATCH, or DEL
 
 ## 8. Rich-text rendering falls back to plain text
 
-The built-in rich-text field was added after the v1.0.0 tag; its fallback is a normal textarea and it does not render submitted values as HTML. If you adopted the unreleased earlier field implementation, it no longer uses any editor or UI library dependency. Applications that add an editor must sanitize HTML on the server before storage and use a vetted renderer with an explicit sanitization policy. Do not restore `v-html` for form values.
+The built-in rich-text field's fallback is a normal textarea and it does not render submitted values as HTML. If you adopted an earlier pre-release field implementation, it no longer uses any editor or UI library dependency. Applications that add an editor must sanitize HTML on the server before storage and use a vetted renderer with an explicit sanitization policy. Do not restore `v-html` for form values.
 
 ## 9. Republish the new Vue component set
 
