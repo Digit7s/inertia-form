@@ -18,9 +18,9 @@ Notable changes are documented here. Dates use ISO 8601. The v2.0.0 entry descri
 
 ### Added
 
-- Laravel 13 is included in the package's declared Illuminate constraints, pending the release compatibility matrix.
+- Laravel 13 is included in the package's declared Illuminate constraints and verified alongside Laravel 12 in the release compatibility matrix.
 - Form lifecycle props and exposed reset/submit controls, field error focus, upload progress, nested fields, and native component implementations.
-- Reproducible frontend and Laravel integration quality gates are being prepared.
+- Reproducible PHP, Vue, clean-consumer, and browser smoke quality gates are included in GitHub Actions.
 
 ### Fixed
 
