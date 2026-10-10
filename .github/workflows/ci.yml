@@ -41,7 +41,13 @@ jobs:
           extensions: mbstring, sqlite3, pdo_sqlite
           coverage: none
           tools: composer:v2
-          cache: composer
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-${{ matrix.php }}-
       - name: Validate Composer metadata
         run: composer validate --strict --no-check-lock
       - name: Resolve compatible test dependencies
@@ -53,7 +59,7 @@ jobs:
       - name: Check PHP syntax
         run: find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Run Pest
-        run: composer test
+        run: vendor/bin/pest --no-coverage
       - name: Check Pint formatting
         run: composer lint
 
