@@ -60,10 +60,10 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import InertiaForm from './InertiaForm/components/InertiaForm.vue';
 
-const pages = import.meta.glob('./Pages/**/*.vue');
+const pages = import.meta.glob('./pages/**/*.vue');
 
 createInertiaApp({
-  resolve: (name) => pages[`./Pages/${name}.vue`](),
+  resolve: (name) => pages[`./pages/${name}.vue`](),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
@@ -73,7 +73,7 @@ createInertiaApp({
 });
 ```
 
-The example assumes `app.ts` is at `resources/js/app.ts`, pages are under `resources/js/Pages`, and the Laravel Vite Vue plugin is already configured. If your app uses a different page resolver or app entry, keep that setup and adjust only the relative import path. Use the real Inertia Vue adapter and the same `createInertiaApp` setup your other pages use.
+The example assumes `app.ts` is at `resources/js/app.ts`, pages are under `resources/js/pages` as in the Inertia Laravel 3 default configuration, and the Laravel Vite Vue plugin is already configured. If your app uses a different page resolver or app entry, keep that setup and adjust only the relative import path. Use the real Inertia Vue adapter and the same `createInertiaApp` setup your other pages use.
 
 A page can then render the form with the server-provided payload:
 

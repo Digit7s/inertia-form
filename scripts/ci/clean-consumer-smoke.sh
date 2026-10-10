@@ -57,7 +57,7 @@ cp -R "$FIXTURE_ROOT/app/Http/Middleware/." app/Http/Middleware/
 cp -R "$FIXTURE_ROOT/app/Models/." app/Models/
 cp -R "$FIXTURE_ROOT/database/migrations/." database/migrations/
 cp "$FIXTURE_ROOT/routes/web.php" routes/web.php
-cp -R "$FIXTURE_ROOT/resources/js/Pages/." resources/js/Pages/
+cp -R "$FIXTURE_ROOT/resources/js/pages/." resources/js/pages/
 cp "$FIXTURE_ROOT/resources/views/app.blade.php" resources/views/app.blade.php
 cp "$FIXTURE_ROOT/InertiaFormIntegration.php" tests/Feature/InertiaFormIntegrationTest.php
 mkdir -p tests/e2e tests/fixtures
@@ -80,17 +80,17 @@ export default defineConfig({
 });
 JS
 
-mkdir -p resources/js/Pages
+mkdir -p resources/js/pages
 cat > resources/js/app.js <<'JS'
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import InertiaForm from './InertiaForm/components/InertiaForm.vue';
 import '../css/app.css';
 
-const pages = import.meta.glob('./Pages/**/*.vue');
+const pages = import.meta.glob('./pages/**/*.vue');
 
 createInertiaApp({
-    resolve: (name) => pages[`./Pages/${name}.vue`](),
+    resolve: (name) => pages[`./pages/${name}.vue`](),
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
@@ -99,7 +99,7 @@ createInertiaApp({
     },
 });
 JS
-cat > resources/js/Pages/ConsumerSmoke.vue <<'VUE'
+cat > resources/js/pages/ConsumerSmoke.vue <<'VUE'
 <script setup lang="ts">
 defineProps<{ formPayload: Record<string, unknown> }>();
 </script>
