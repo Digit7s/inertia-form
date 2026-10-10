@@ -15,7 +15,7 @@ class InertiaFormServiceProvider extends ServiceProvider
             ]);
 
             $this->publishes([
-                __DIR__.'/../resources/js' => resource_path('js/InertiaForm'),
+                __DIR__.'/../resources/js/components' => resource_path('js/InertiaForm/components'),
             ], 'inertia-form-components');
         }
     }
