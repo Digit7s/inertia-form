@@ -51,7 +51,7 @@
         "laravel/pint": "^1.29"
     },
     "scripts": {
-        "test": "pest",
+        "test": "pest --cache-directory .phpunit.cache",
         "lint": "pint --test"
     },
     "config": {

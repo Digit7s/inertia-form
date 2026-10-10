@@ -59,7 +59,7 @@ jobs:
       - name: Check PHP syntax
         run: find src tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Run Pest
-        run: vendor/bin/pest --no-coverage
+        run: composer test -- --no-coverage
       - name: Check Pint formatting
         run: composer lint
 
